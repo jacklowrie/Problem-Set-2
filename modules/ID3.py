@@ -28,8 +28,11 @@ def check_homogenous(data_set):
     Output: Return either the homogenous attribute or None
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    check_value = data_set[0][0]
+    for element in data_set:
+        if (element[0]!= check_value):
+            return None
+    return check_value
 # ======== Test Cases =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
 # check_homogenous(data_set) ==  None
@@ -75,8 +78,18 @@ def mode(data_set):
     Output: mode of index 0.
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    count = [0,0]
+    
+    for element in data_set:
+       if element[0] == 0:
+           count[0]= count[0]+1
+       elif element[0] ==1:
+           count[1]= count[1]+1
+           
+    if count[0]>count[1]:
+       return 0
+    else:
+       return 1
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
 # mode(data_set) == 1

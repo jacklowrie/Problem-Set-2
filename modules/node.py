@@ -34,9 +34,20 @@ class Node:
     def classify(self, instance):
         '''
         given a single observation, will return the output of the tree
+        Do not know if this is the right implementation 
         '''
-	# Your code here
-	pass
+        if(self.label != None):
+            return self.label
+        elif(self.is_nominal):
+            classifier = self.children[instance[self.decision_attribute]]
+            return classifier.classify(instance)
+        elif(instance[self.decision_attribute]>self.splitting_value):
+            classifier = self.children[1]
+            return classifier.classify(instance)
+        else:
+            classifier = self.children[0]
+            return classifier.classify(instance)
+         
 
     def print_tree(self, indent = 0):
         '''
