@@ -1,6 +1,7 @@
 import math
 from node import Node
 import sys
+from collections import Counter
 
 def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     '''
@@ -78,18 +79,14 @@ def mode(data_set):
     Output: mode of index 0.
     ========================================================================================================
     '''
-    count = [0,0]
+    element_list = []
     
     for element in data_set:
-       if element[0] == 0:
-           count[0]= count[0]+1
-       elif element[0] ==1:
-           count[1]= count[1]+1
-           
-    if count[0]>count[1]:
-       return 0
-    else:
-       return 1
+        element_list.append(element[0])
+    counter = Counter(element_list)
+    
+    value, num = counter.most_common(1)[0]
+    return value   
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
 # mode(data_set) == 1
@@ -106,7 +103,10 @@ def entropy(data_set):
     Output: Returns entropy. See Textbook for formula
     ========================================================================================================
     '''
-
+    total = 0
+    for element in data_set:
+        total += element[0]
+    
 
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[0],[1],[1],[1]]
