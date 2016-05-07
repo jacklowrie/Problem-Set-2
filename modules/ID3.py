@@ -55,8 +55,30 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     Output: best attribute, split value if numeric
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    max_value = 0
+    best_data = 0
+    best_numeric_split = 0
+    
+    for val in range(1,len(data_set[0])):
+        if  attribute_metadata[val]['is_nominal']:
+            gain_ratio = gain_ratio_nominal(data_set, val)
+            if gain_ratio> max_value:
+                max_value = gain_ratio
+                best_data = val
+        else:
+            gain_ratio, split = gain_ratio_numeric(data_set, val, 1)
+            if gain_ratio> max_value:
+                max_value = gain_ratio
+                best_data = val
+                best_numeric_split = split
+    if max_value == 0:
+        return False, False
+    if attribute_metadata[val]['is_nominal']:
+        return best_data, False
+    else:
+        return best_data, best_numeric_split
+        
+    
 
 # # ======== Test Cases =============================
 # numerical_splits_count = [20,20]
@@ -103,10 +125,25 @@ def entropy(data_set):
     Output: Returns entropy. See Textbook for formula
     ========================================================================================================
     '''
-    total = 0
-    for element in data_set:
-        total += element[0]
+    count_vals = {}
+    entropy = 0
+    for val in data_set:
+        index = val[0]
+        if val[0] in count_vals.keys():
+            count_vals[index]= count_vals[index]+1
+        else:
+            count_vals[index] = 1
     
+    for key, val in count_vals.items():
+
+        if val == len(data_set):
+            return 0
+        weight = (float)(val)/ (float) (len(data_set))
+        entropy =entropy+ weight * math.log(weight,2)
+    
+    return -entropy
+        
+        
 
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[0],[1],[1],[1]]
@@ -127,8 +164,25 @@ def gain_ratio_nominal(data_set, attribute):
     Output: Returns gain_ratio. See https://en.wikipedia.org/wiki/Information_gain_ratio
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    count_vals = {}
+    all_values = []
+    for val in data_set:
+        all_values.append([val[0]])
+        if val[attribute] in count_vals.keys():
+            count_vals[val[attribute]].append([val[0]])
+        else:
+            count_vals[val[attribute]] = [[val[0]]]
+    
+    total = 0
+    iv = 0
+    for val in count_vals:
+        weight = (float)(len(count_vals[val]))/ (len(data_set))
+        total += weight * entropy(count_vals[val])
+        iv -= weight *math.log(weight, 2)
+        
+    return (entropy(all_values) - total)/iv
+
+
 # ======== Test case =============================
 # data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
 # gain_ratio_nominal(data_set,attr) == 0.11470666361703151
@@ -152,8 +206,33 @@ def gain_ratio_numeric(data_set, attribute, steps):
     Output: This function returns the gain ratio and threshold value
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    
+    ent = entropy(data_set)
+    threshold_val = 0
+    max_gain_ratio = 0
+    iv = 0
+    val = 0
+    while val < len(data_set):
+        split = split_on_numerical(data_set, attribute, data_set[val][attribute])
+        if(split != None):
+            first_ent = entropy(split[0])
+            sec_ent = entropy(split[1])
+            first_weight = (float)(len(split[0]))/(len(data_set))
+            sec_weight = (float)(len(split[1]))/(len(data_set))
+            gain_ratio = ent - first_ent*first_weight - sec_ent*sec_weight
+            if gain_ratio> max_gain_ratio:
+                max_gain_ratio = gain_ratio
+                threshold_val = data_set[val][attribute] 
+                iv = -first_weight*math.log(first_weight,2) - sec_weight*math.log(sec_weight,2)
+        val+= steps
+    if iv == 0:
+        return False
+    else: 
+        return (float)(max_gain_ratio)/iv, threshold_val
+        
+
+    
+    
 # ======== Test case =============================
 # data_set,attr,step = [[1,0.05], [1,0.17], [1,0.64], [0,0.38], [1,0.19], [1,0.68], [1,0.69], [1,0.17], [1,0.4], [0,0.53]], 1, 2
 # gain_ratio_numeric(data_set,attr,step) == (0.31918053332474033, 0.64)
@@ -172,8 +251,15 @@ def split_on_nominal(data_set, attribute):
     Output: Dictionary of all values pointing to a list of all the data with that attribute
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    result = {}
+    for val in data_set:
+        if val[attribute] in result.keys():
+            result[val[attribute]].append([val[0], val[attribute]])
+        else:
+            result[val[attribute]] =  [[val[0], val[attribute]]]
+    
+    return result
+    
 # ======== Test case =============================
 # data_set, attr = [[0, 4], [1, 3], [1, 2], [0, 0], [0, 0], [0, 4], [1, 4], [0, 2], [1, 2], [0, 1]], 1
 # split_on_nominal(data_set, attr) == {0: [[0, 0], [0, 0]], 1: [[0, 1]], 2: [[1, 2], [0, 2], [1, 2]], 3: [[1, 3]], 4: [[0, 4], [0, 4], [1, 4]]}
@@ -191,8 +277,20 @@ def split_on_numerical(data_set, attribute, splitting_value):
     Output: Tuple of two lists as described above
     ========================================================================================================
     '''
-    # Your code here
-    pass
+        
+    first_half = []
+    
+    second_half = []
+    
+    
+    for val in data_set:
+        if val[attribute]< splitting_value:
+            first_half.append([val[0], val[attribute]])
+        else:
+            second_half.append([val[0], val[attribute]])
+        
+    
+    return (first_half, second_half)
 # ======== Test case =============================
 # d_set,a,sval = [[1, 0.25], [1, 0.89], [0, 0.93], [0, 0.48], [1, 0.19], [1, 0.49], [0, 0.6], [0, 0.6], [1, 0.34], [1, 0.19]],1,0.48
 # split_on_numerical(d_set,a,sval) == ([[1, 0.25], [1, 0.19], [1, 0.34], [1, 0.19]],[[1, 0.89], [0, 0.93], [0, 0.48], [1, 0.49], [0, 0.6], [0, 0.6]])
