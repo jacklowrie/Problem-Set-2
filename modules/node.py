@@ -34,7 +34,6 @@ class Node:
     def classify(self, instance):
         '''
         given a single observation, will return the output of the tree
-        Do not know if this is the right implementation 
         '''
         if(self.label != None):
             return self.label

@@ -16,8 +16,44 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     ========================================================================================================
 
     '''
-    # Your code here
-    pass
+    
+    root = Node()
+    homogenous = check_homogenous(data_set)
+    if homogenous!= None:
+        root.label = homogenous
+        return root
+    if depth == 0:
+        root.label = mode(data_set)
+        return root
+    best_att, best_split = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
+    numerical_splits_count[best_att] -= 1
+    if best_att == False:
+        root.label = mode(data_set)
+        return root
+    root.decision_attribute = best_att
+    root.splitting_value = best_split
+    root.name = attribute_metadata[best_att]['name']
+    root.is_nominal = attribute_metadata[best_att]['is_nominal']
+    if(root.is_nominal):
+        examples = {}
+        for k, val in split_on_nominal(data_set, best_att):
+            examples[k] = ID3(val, attribute_metadata, numerical_splits_count, depth-1)
+    else:
+        examples = [0,0]
+        first_split, second_split = split_on_numerical(data_set, best_att, best_split)
+        examples[0] = ID3(first_split, attribute_metadata, numerical_splits_count, depth-1)
+        examples[1] = ID3(second_split, attribute_metadata, numerical_splits_count, depth-1)
+    root.children = examples
+    return root
+    
+    
+        
+            
+            
+    
+    
+    
+        
 
 def check_homogenous(data_set):
     '''
@@ -66,7 +102,7 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
                 max_value = gain_ratio
                 best_data = val
         else:
-            gain_ratio, split = gain_ratio_numeric(data_set, val, 1)
+            (gain_ratio, split) = gain_ratio_numeric(data_set, val, 1)
             if gain_ratio> max_value:
                 max_value = gain_ratio
                 best_data = val
@@ -77,6 +113,7 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
         return best_data, False
     else:
         return best_data, best_numeric_split
+        
         
     
 
@@ -225,10 +262,11 @@ def gain_ratio_numeric(data_set, attribute, steps):
                 threshold_val = data_set[val][attribute] 
                 iv = -first_weight*math.log(first_weight,2) - sec_weight*math.log(sec_weight,2)
         val+= steps
+        
     if iv == 0:
-        return False
-    else: 
-        return (float)(max_gain_ratio)/iv, threshold_val
+        return None, None
+    
+    return (float)(max_gain_ratio)/iv, threshold_val
         
 
     
