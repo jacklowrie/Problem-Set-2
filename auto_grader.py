@@ -228,7 +228,9 @@ def check_ID3():
    if n and [n.classify(x) == x[0] for x in data_set] == [True, False, True, True, False, True, True, True, True, True, True]:
       print "Passed 2"
    else:
-      print "Failed 2"
+      print "Failed 2."
+      print [True, False, True, True, False, True, True, True, True, True, True]
+      print [n.classify(x) == x[0] for x in data_set]
       fails += 1
 
    attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]

@@ -40,7 +40,7 @@ class Node:
         elif(self.is_nominal):
             classifier = self.children[instance[self.decision_attribute]]
             return classifier.classify(instance)
-        elif(instance[self.decision_attribute]>self.splitting_value):
+        elif(instance[self.decision_attribute]>=self.splitting_value):
             classifier = self.children[1]
             return classifier.classify(instance)
         else:
