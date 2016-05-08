@@ -26,6 +26,9 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
         root.label = mode(data_set)
         return root
     best_att, best_split = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
+    if(numerical_splits_count[best_att]==0):
+        root.label = mode(data_set)
+        return root
     numerical_splits_count[best_att] -= 1
     if best_att == False:
         root.label = mode(data_set)
@@ -45,6 +48,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
         examples[1] = ID3(second_split, attribute_metadata, numerical_splits_count, depth-1)
     root.children = examples
     return root
+    
     
     
         
