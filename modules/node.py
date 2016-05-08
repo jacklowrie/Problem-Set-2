@@ -20,6 +20,8 @@
 #
 # name - name of the attribute being split on
 
+printed = ''
+
 class Node:
     def __init__(self):
         # initialize all attributes
@@ -60,4 +62,62 @@ class Node:
         '''
         returns the disjunct normalized form of the tree.
         '''
-        pass
+        
+        return self.dnft('')
+
+    
+    def dnft(self, hidden):
+    	global printed
+    	if (self.label != None):
+        	if (self.label == 1):
+        		print "reached leaf"
+        		print "printed: " + printed + "\nhidden: " + hidden
+        		printed += "("+ hidden + ") || "
+        		hidden = ''
+        		
+        elif self.is_nominal:
+        	for child in self.children:
+        		if hidden == '':
+        			hidden += self.name + "=" + str(self.children[child].name)
+        			print "printed: " + printed + "\nhidden: " + hidden
+        			self.children[child].dnft(hidden)
+        			        	
+        		else:
+        			hidden += '&' + self.name + str(self.children[child].name)
+        			print "printed: " + printed + "\nhidden: " + hidden
+        			self.children[child].dnft(hidden)
+		else:
+			if hidden == '':
+				print "printed: " + printed + "\nhidden: " + hidden
+				self.children[0].dnft(self.name + '<' + str(self.splitting_value))
+				print "printed: " + printed + "\nhidden: " + hidden
+				self.children[1].dnft(self.name + '>=' + str(self.splitting_value))
+
+			else:
+				print "printed: " + printed + "\nhidden: " + hidden
+				self.children[0].dnft(hidden + ' ^ ' + self.name + ' < ' + str(self.splitting_value))
+				print "printed: " + printed + "\nhidden: " + hidden
+				self.children[1].dnft(hidden + ' ^ ' + self.name + ' >= ' + str(self.splitting_value))
+		
+		print "printed: " + printed + "\nhidden: " + hidden
+		return printed
+        	
+
+
+
+
+
+A = Node()
+A.name = 'A'
+
+Aa = Node()
+
+
+B = Node()
+B.name = 'B'
+
+
+
+
+
+

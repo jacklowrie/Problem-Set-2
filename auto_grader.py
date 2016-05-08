@@ -218,6 +218,7 @@ def check_ID3():
    fails = 0;
    if n and n.label == 1:
       print "Passed 1"
+      print n.print_dnf_tree()
    else:
       print "Failed 1"
       fails += 1
