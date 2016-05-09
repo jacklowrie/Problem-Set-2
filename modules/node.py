@@ -54,70 +54,79 @@ class Node:
         '''
         returns a string of the entire tree in human readable form
         '''
-        # Your code here
-        pass
+        queue = []
+        bfs_str ='';
+        queue.append(self)
+        while len(queue):
+            popped = queue.pop(0)
+            bfs_str += (str(popped.splitting_value) + ' ');
+            if popped.children is not None:
+                for key in popped.children:
+                    queue.append(popped.children[key])
+        return bfs_str[:-1];
 
 
     def print_dnf_tree(self):
         '''
         returns the disjunct normalized form of the tree.
         '''
-        
         return self.dnft('')
-
     
-    def dnft(self, hidden):
+	def dnft(self, hidden):
     	global printed
-    	if (self.label != None):
-        	if (self.label == 1):
+    	
+    	if self.label != None: #base case (leaf)
+        	if self.label == 1:
         		print "reached leaf"
-        		print "printed: " + printed + "\nhidden: " + hidden
         		printed += "("+ hidden + ") || "
         		hidden = ''
-        		
-        elif self.is_nominal:
+        		    		
+        elif self.is_nominal: #recurse on nominal nodes
+        	print 'reached nominal recursive case'
         	for child in self.children:
         		if hidden == '':
         			hidden += self.name + "=" + str(self.children[child].name)
-        			print "printed: " + printed + "\nhidden: " + hidden
         			self.children[child].dnft(hidden)
         			        	
         		else:
-        			hidden += '&' + self.name + str(self.children[child].name)
-        			print "printed: " + printed + "\nhidden: " + hidden
+        			hidden += '&&' + self.name + str(self.children[child].name)
         			self.children[child].dnft(hidden)
-		else:
-			if hidden == '':
-				print "printed: " + printed + "\nhidden: " + hidden
-				self.children[0].dnft(self.name + '<' + str(self.splitting_value))
-				print "printed: " + printed + "\nhidden: " + hidden
-				self.children[1].dnft(self.name + '>=' + str(self.splitting_value))
-
-			else:
-				print "printed: " + printed + "\nhidden: " + hidden
-				self.children[0].dnft(hidden + ' ^ ' + self.name + ' < ' + str(self.splitting_value))
-				print "printed: " + printed + "\nhidden: " + hidden
-				self.children[1].dnft(hidden + ' ^ ' + self.name + ' >= ' + str(self.splitting_value))
 		
-		print "printed: " + printed + "\nhidden: " + hidden
-		return printed
-        	
+        else:	
+			return printed
+			
+		return 'i made it'
 
 
+#test tree for printing (from writeup)
 
-
-
-A = Node()
-A.name = 'A'
-
-Aa = Node()
-
-
-B = Node()
-B.name = 'B'
-
-
-
+# A = Node()
+# A.name = 'A'
+# A.is_nominal = False
+# A.splitting_value = 1
+# 
+# Aa = Node()
+# Aa.label = 1
+# Aa.name = 'Aa'
+# A.children.append(Aa)
+# 
+# B = Node()
+# B.name = 'B'
+# B.is_nominal = False
+# B.splitting_value = 1
+# A.children.append(B)
+# 
+# Ba = Node()
+# Ba.name = 'Ba'
+# Ba.label = 1
+# B.children.append(Ba)
+# 
+# Bb = Node()
+# Bb.name = 'Bb'
+# Bb.label = 0
+# B.children.append(Bb)
+# 
+# print A.print_dnf_tree()
 
 
 
