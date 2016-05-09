@@ -2,7 +2,7 @@
 # =====================================
 # Class node attributes:
 # ----------------------------
-# children - a list of 2 if numeric and a dictionary if nominal.  
+# children - a list of 2 nodes if numeric, and a dictionary (key=attribute value, value=node) if nominal.  
 #            For numeric, the 0 index holds examples < the splitting_value, the 
 #            index holds examples >= the splitting value
 #
@@ -20,7 +20,8 @@
 #
 # name - name of the attribute being split on
 
-printed = ''
+dnf_str = ''
+first_str =''
 
 class Node:
     def __init__(self):
@@ -37,73 +38,59 @@ class Node:
         '''
         given a single observation, will return the output of the tree
         '''
-        if(self.label != None):
+        if self.label != None:
             return self.label
-        elif(self.is_nominal):
-            classifier = self.children[instance[self.decision_attribute]]
-            return classifier.classify(instance)
-        elif(instance[self.decision_attribute]>=self.splitting_value):
-            classifier = self.children[1]
-            return classifier.classify(instance)
         else:
-            classifier = self.children[0]
-            return classifier.classify(instance)
-         
+            if self.is_nominal:
+                return self.children[instance[self.decision_attribute]].classify(instance)
+            else:
+                if instance[self.decision_attribute] >= self.splitting_value:
+                    return self.children[1].classify(instance)
+                else:
+                    return self.children[0].classify(instance)
 
-    def print_tree(self, indent = 0):
+    def print_tree(self, level=0):
         '''
         returns a string of the entire tree in human readable form
         '''
-        queue = []
-        bfs_str ='';
-        queue.append(self)
-        while len(queue):
-            popped = queue.pop(0)
-            bfs_str += (str(popped.splitting_value) + ' ');
-            if popped.children is not None:
-                for key in popped.children:
-                    queue.append(popped.children[key])
-        return bfs_str[:-1];
-
+        pass
+             
 
     def print_dnf_tree(self):
         '''
         returns the disjunct normalized form of the tree.
         '''
-        return self.dnft('')
-    def dnft(self, hidden):
-        return 'dnft not implemented'
+        caseList = []
+        totStr = ''
+        
+        for i in self.print_dnf_tree_helper(""):
+            newStr = "(" + i + ")"
+            caseList.append(newStr)
+            
+        for x in xrange(0,len(caseList)):
+            if x == 0:
+                totStr+= caseList[x]
+            else:
+                caseList[x] = " OR " + caseList[x]
+                totStr+= caseList[x]
+                
+        return totStr
+            
 
-
-#test tree for printing (from writeup)
-
-# A = Node()
-# A.name = 'A'
-# A.is_nominal = False
-# A.splitting_value = 1
-# 
-# Aa = Node()
-# Aa.label = 1
-# Aa.name = 'Aa'
-# A.children.append(Aa)
-# 
-# B = Node()
-# B.name = 'B'
-# B.is_nominal = False
-# B.splitting_value = 1
-# A.children.append(B)
-# 
-# Ba = Node()
-# Ba.name = 'Ba'
-# Ba.label = 1
-# B.children.append(Ba)
-# 
-# Bb = Node()
-# Bb.name = 'Bb'
-# Bb.label = 0
-# B.children.append(Bb)
-# 
-# print A.print_dnf_tree()
-
-
-
+    def print_dnf_tree_helper(self, linked):
+        '''
+        returns the disjunct normalized form of the tree.
+        '''
+        if self.label != None:
+            if self.label == 1:
+                return [linked[5:]]
+            else:
+                return []
+        totSum = []
+        for (x,y) in [("<", self.children[0]), (">=", self.children[1])]:
+            temp = linked + " AND " + str(self.name) + " " + x + " " + str(self.splitting_value)
+            totSum += y.print_dnf_tree_helper(temp)
+        return totSum
+        
+    
+        
