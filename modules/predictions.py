@@ -17,19 +17,14 @@ def create_predictions(tree, predict):
     Given a tree and a url to a data_set. Create a csv with a prediction for each result
     using the classify method in node class.
     '''
-    with open(predict, 'rb') as f:
-        reader = csv.reader(f,csv.QUOTE_NONE)
-        labels = reader.next()
-        predict = list(reader)
-    results = []
-    with open('results.csv', 'wb') as resultsfile:
-        wr = csv.writer(resultsfile, quoting=csv.QUOTE_ALL)
-        for instance in predict:
-            instance.insert(0, instance.pop())
+    
+    test_set, attr = parse(predict, True)
+    size = len(test_set)
+    for i in range(size):      
+        value = tree.classify(test_set[i])
+        test_set[i][0] = value
+    myfile = open('data/results.csv', 'wb')
+    for i in range(len(test_set)):
+        wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+        wr.writerow(test_set[i])
 
-            for i in range(len(instance)):
-                try:
-                    instance[i]=float(instance[i])
-                except ValueError:
-                    pass   
-            wr.writerow([tree.classify(instance)])
