@@ -3,6 +3,7 @@ from modules.parse import *
 from modules.pruning import *
 from modules.graph import *
 from modules.predictions import *
+from modules.node import *
 
 # DOCUMENATION
 # ===========================================
@@ -15,10 +16,10 @@ options = {
     'validate': 'data/test_bvalidate.csv',
     'predict': 'data/test_btest.csv',
     'limit_splits_on_numerical': 5,
-    'limit_depth': 20,
+    'limit_depth': 5,
     'print_tree': False,
     'print_dnf' : True,
-    'prune' : 'data/test_bvalidate.csv',
+    'prune' : False,
     'learning_curve' : {
         'upper_bound' : 1.0,
         'increment' : 0.1
@@ -50,7 +51,8 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     if prune != False:
         print '###\n#  Pruning\n###'
         pruning_set, _ = parse(prune, False)
-        reduced_error_pruning(tree,train_set,pruning_set, 0)
+        n = Node()
+        reduced_error_pruning(tree,train_set,pruning_set, 0, n)
         print ''
 
     # print tree visually
@@ -86,12 +88,12 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
         print ''
 
     # generate a learning curve using the validation set
-    if learning_curve and validate:
+    """if learning_curve and validate:
         print '###\n#  Generating Learning Curve\n###'
         iterations = 5 # number of times to test each size
         get_graph(train_set, attribute_metadata, validate_set, 
             numerical_splits_count, depth, iterations, 0, learning_curve['upper_bound'],
             learning_curve['increment'])
         print ''
-
+    """
 tree = decision_tree_driver( **options )

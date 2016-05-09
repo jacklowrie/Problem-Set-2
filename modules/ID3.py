@@ -22,42 +22,69 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     if homogenous!= None:
         root.label = homogenous
         return root
-    if depth == 0:
+        
+    if depth == 0  or len(data_set)==0 or len(attribute_metadata)<=1:
         root.label = mode(data_set)
         return root
+        
     best_att, best_split = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
     if(numerical_splits_count[best_att]==0):
         root.label = mode(data_set)
         return root
-    numerical_splits_count[best_att] -= 1
+        
+
     if best_att == False:
         root.label = mode(data_set)
         return root
+        
     root.decision_attribute = best_att
     root.splitting_value = best_split
     root.name = attribute_metadata[best_att]['name']
     root.is_nominal = attribute_metadata[best_att]['is_nominal']
     if(root.is_nominal):
         examples = {}
-        for k, val in split_on_nominal(data_set, best_att):
+        
+        for k, val in split_on_nominal(data_set, best_att).items():
+            if is_missing(val, best_att):
+                val = replace_missing(val, best_att)
             examples[k] = ID3(val, attribute_metadata, numerical_splits_count, depth-1)
+        root.children = examples
     else:
+        root.children = []
         examples = [0,0]
         first_split, second_split = split_on_numerical(data_set, best_att, best_split)
+        if is_missing(first_split, best_att):
+            first_split= replace_missing(first_split, best_att)
+        if is_missing(second_split, best_att):
+            second_split = replace_missing(second_split, best_att)
+        numerical_splits_count[best_att] -= 1
         examples[0] = ID3(first_split, attribute_metadata, numerical_splits_count, depth-1)
         examples[1] = ID3(second_split, attribute_metadata, numerical_splits_count, depth-1)
-    root.children = examples
+        root.children.append(examples[0])
+        root.children.append(examples[1])
     return root
     
     
+def is_missing(data_set, index):
+    for i in range(len(data_set)):
+        if len(data_set[i])> index:
+            if data_set[i][index] == None:
+                return True
+    return False
     
-        
-            
-            
+def replace_missing(data_set, index):
+    vals = []
+    for i in range(len(data_set)):
+        if len(data_set[i])> index:
+            if data_set[i][index]!= None:
+                vals.append([data_set[i][index]])
+    most_common = mode(vals)
     
-    
-    
-        
+    for i in range(len(data_set)):
+        if len(data_set[i])> index:
+            if data_set[i][index] == None:
+                data_set[i][index] = most_common
+    return data_set
 
 def check_homogenous(data_set):
     '''
@@ -113,7 +140,7 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
                 best_numeric_split = split
     if max_value == 0:
         return False, False
-    if attribute_metadata[val]['is_nominal']:
+    if attribute_metadata[best_data]['is_nominal']:
         return best_data, False
     else:
         return best_data, best_numeric_split
@@ -143,13 +170,14 @@ def mode(data_set):
     ========================================================================================================
     '''
     element_list = []
-    
-    for element in data_set:
-        element_list.append(element[0])
-    counter = Counter(element_list)
-    
-    value, num = counter.most_common(1)[0]
-    return value   
+    if data_set!=[]:
+        for element in data_set:
+            element_list.append(element[0])
+        counter = Counter(element_list)
+        
+        value, num = counter.most_common(1)[0]
+        return value
+    return False
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
 # mode(data_set) == 1
@@ -220,7 +248,8 @@ def gain_ratio_nominal(data_set, attribute):
         weight = (float)(len(count_vals[val]))/ (len(data_set))
         total += weight * entropy(count_vals[val])
         iv -= weight *math.log(weight, 2)
-        
+    if iv == 0:
+       return False
     return (entropy(all_values) - total)/iv
 
 
@@ -314,7 +343,7 @@ def split_on_numerical(data_set, attribute, splitting_value):
     Input:  Subset of data set, the index for a numeric attribute, threshold (splitting) value
     ========================================================================================================
     Job:    Splits data_set into a tuple of two lists, the first list contains the examples where the given
-	attribute has value less than the splitting value, the second list contains the other examples
+    attribute has value less than the splitting value, the second list contains the other examples
     ========================================================================================================
     Output: Tuple of two lists as described above
     ========================================================================================================
@@ -325,14 +354,15 @@ def split_on_numerical(data_set, attribute, splitting_value):
     second_half = []
     
     
-    for val in data_set:
-        if val[attribute]< splitting_value:
-            first_half.append([val[0], val[attribute]])
+    for val in range(len(data_set)):
+        if data_set[val][attribute]< splitting_value:
+            first_half.append(data_set[val])
         else:
-            second_half.append([val[0], val[attribute]])
+            second_half.append(data_set[val])
         
     
     return (first_half, second_half)
+
 # ======== Test case =============================
 # d_set,a,sval = [[1, 0.25], [1, 0.89], [0, 0.93], [0, 0.48], [1, 0.19], [1, 0.49], [0, 0.6], [0, 0.6], [1, 0.34], [1, 0.19]],1,0.48
 # split_on_numerical(d_set,a,sval) == ([[1, 0.25], [1, 0.19], [1, 0.34], [1, 0.19]],[[1, 0.89], [0, 0.93], [0, 0.48], [1, 0.49], [0, 0.6], [0, 0.6]])
