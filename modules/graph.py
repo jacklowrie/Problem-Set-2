@@ -59,18 +59,23 @@ def get_graph(train_set, attribute_metadata, validate_set, numerical_splits_coun
     function will graph the results from get_graph_data in reference to the drange 
     percentages of the data.
     '''
-    pcts = []
+    return get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, iterations, [0.1, 0.2, 0.3, 0.4, 0.5])
+    # #set up percentages
+    # pcts = []
+    # x = lower
+    # while x <= upper:
+    # 	pcts.append(x)
+    # 	x += increment
+    # print pcts
 
-    x = lower
-    while x <= upper:
-    	pcts.append(pt)
-    	x += increment
-
-    data = get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, iterations, pcts)
-    plt.plot(pcts, data)
-    plt.ylabel('accuracy')
-    plt.xlabel('training subset size')
-    plt.show()
+    # #get plotting points
+    # data = get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, iterations, pcts)
+    
+    # #set up the graph
+    # plt.plot(pcts, data)
+    # plt.ylabel('accuracy')
+    # plt.xlabel('training subset size')
+    # plt.show()
 
 
 

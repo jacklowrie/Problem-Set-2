@@ -20,8 +20,8 @@ options = {
     'print_dnf' : True,
     'prune' : False,
     'learning_curve' : {
-        'upper_bound' : 0.05,
-        'increment' : 0.001
+        'upper_bound' : 1.0,
+        'increment' : 0.1
     }
 }
 
