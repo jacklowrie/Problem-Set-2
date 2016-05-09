@@ -71,7 +71,7 @@ class Node:
             if x == 0:
                 totStr+= caseList[x]
             else:
-                caseList[x] = " || " + caseList[x]
+                caseList[x] = "\n|| " + caseList[x]
                 totStr+= caseList[x]
                 
         return totStr
@@ -83,7 +83,7 @@ class Node:
         '''
         if self.label != None:
             if self.label == 1:
-                return [linked[5:]]
+                return [linked[4:]]
             else:
                 return []
         totSum = []
