@@ -1,1 +1,1 @@
-(numinjured < 2.0 AND winpercent < 1.0 AND winpercent < -2.0) OR (numinjured < 2.0 AND winpercent >= 1.0) OR (numinjured >= 2.0 AND winpercent < 3.0) OR (numinjured >= 2.0 AND winpercent >= 3.0)
+(uminjured < 2.0 && winpercent < 1.0 && winpercent < -2.0) || (uminjured < 2.0 && winpercent >= 1.0) || (uminjured >= 2.0 && winpercent < 3.0) || (uminjured >= 2.0 && winpercent >= 3.0)
