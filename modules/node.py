@@ -71,31 +71,8 @@ class Node:
         returns the disjunct normalized form of the tree.
         '''
         return self.dnft('')
-    
-	def dnft(self, hidden):
-    	global printed
-    	
-    	if self.label != None: #base case (leaf)
-        	if self.label == 1:
-        		print "reached leaf"
-        		printed += "("+ hidden + ") || "
-        		hidden = ''
-        		    		
-        elif self.is_nominal: #recurse on nominal nodes
-        	print 'reached nominal recursive case'
-        	for child in self.children:
-        		if hidden == '':
-        			hidden += self.name + "=" + str(self.children[child].name)
-        			self.children[child].dnft(hidden)
-        			        	
-        		else:
-        			hidden += '&&' + self.name + str(self.children[child].name)
-        			self.children[child].dnft(hidden)
-		
-        else:	
-			return printed
-			
-		return 'i made it'
+    def dnft(self, hidden):
+        return 'dnft not implemented'
 
 
 #test tree for printing (from writeup)
