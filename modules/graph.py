@@ -20,12 +20,13 @@ def get_graph_accuracy_partial(train_set, attribute_metadata, validate_set, nume
     #make the subset
     train_subset_size = int(math.floor(pct*len(train_set)))
     train_subset = random.sample(train_set, train_subset_size)
+    random.shuffle(train_subset)
 
     #make the tree, determine accuracy
     tree = ID3(train_subset, attribute_metadata, numerical_splits_count, depth)
-    accuracy = validation_accuracy(tree, validate_set)
-    
+    accuracy = validation_accuracy(tree, validate_set)   
     print accuracy
+
     return accuracy
 
 def get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, iterations, pcts):
@@ -34,7 +35,21 @@ def get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits
     iterations, and percentages, this function will return an array of the averaged graph
     accuracy partials based off the number of iterations.
     '''
-    pass
+    data_points = []
+
+    for pct in pcts:
+    	#run get_graph_accuracy_partial() over iterations
+    	iterated_accuracy = []
+    	for x in range(iterations):
+    		iterated_accuracy.append(get_graph_accuracy_partial(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, pct))
+    	
+    	#average the results and add to final array
+    	avg_accuracy = sum(iterated_accuracy)/len(iterated_accuracy)
+    	data_points.append(avg_accuracy)
+
+
+    print data_points
+    return data_points
 
 # get_graph will plot the points of the results from get_graph_data and return a graph
 def get_graph(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, iterations, lower, upper, increment):
@@ -44,4 +59,19 @@ def get_graph(train_set, attribute_metadata, validate_set, numerical_splits_coun
     function will graph the results from get_graph_data in reference to the drange 
     percentages of the data.
     '''
-    return get_graph_accuracy_partial(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, 0.25)
+    pcts = []
+
+    x = lower
+    while x <= upper:
+    	pcts.append(pt)
+    	x += increment
+
+    data = get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits_count, depth, iterations, pcts)
+    plt.plot(pcts, data)
+    plt.ylabel('accuracy')
+    plt.xlabel('training subset size')
+    plt.show()
+
+
+
+    
