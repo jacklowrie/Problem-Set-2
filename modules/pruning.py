@@ -42,17 +42,16 @@ def prune(root, validation_subset, depth):
     return root
 # 
 
+
 def validation_accuracy(tree,validation_set):
     '''
     takes a tree and a validation set and returns the accuracy of the set on the given tree
     '''
     # Your code here
-    passes = 0
-    outputs = [tree.classify(x) == x[0] for x in validation_set]
-    
-    for val in outputs:
-        if outputs == 1:
-            passes += 1
-        
-    return float(passes)/len(validation_set)
+    correct = [1 if tree.classify(x) == x[0] else 0 for x in validation_set]
+    total_correct = sum(correct, 0)
+    total = len(correct)
+
+    return float(total_correct) / total
+
         
