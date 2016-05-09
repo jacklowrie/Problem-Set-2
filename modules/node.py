@@ -71,7 +71,7 @@ class Node:
             if x == 0:
                 totStr+= caseList[x]
             else:
-                caseList[x] = " OR " + caseList[x]
+                caseList[x] = " || " + caseList[x]
                 totStr+= caseList[x]
                 
         return totStr
@@ -87,8 +87,13 @@ class Node:
             else:
                 return []
         totSum = []
+        if self.is_nominal:
+            for (x,y) in self.children.items():
+                temp = linked + " && " + str(self.name) + " = " + str(self.splitting_value)
+                totSum += y.print_dnf_tree_helper(temp)
+            return totSum
         for (x,y) in [("<", self.children[0]), (">=", self.children[1])]:
-            temp = linked + " AND " + str(self.name) + " " + x + " " + str(self.splitting_value)
+            temp = linked + " && " + str(self.name) + " " + x + " " + str(self.splitting_value)
             totSum += y.print_dnf_tree_helper(temp)
         return totSum
         
